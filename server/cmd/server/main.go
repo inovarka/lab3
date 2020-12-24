@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"github.com/go-sql-driver/mysql"
+	_"github.com/go-sql-driver/mysql"
 
 	"github.com/inovarka/lab3/server/db"
 )
