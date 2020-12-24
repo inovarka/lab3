@@ -1,4 +1,3 @@
-use balancer_db;
 
 create table Balancer(
 	ID int auto_increment,

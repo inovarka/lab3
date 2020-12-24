@@ -1,4 +1,3 @@
-use balancer_db;
 
 insert into Balancer(Name)
 values
