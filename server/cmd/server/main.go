@@ -12,7 +12,24 @@ type balancer struct {
 	name string
 }
 
+type Connection struct {
+	DbName         string
+	User, Password string
+}
+
+func (c *Connection) ConnectionURL() string {
+	str := c.User + ":" + c.Password + "@/" + c.DbName
+	return str
+}
+
 func main() {
+	conn := &Connection{
+		DbName:   "db1",
+		User:     "user1",
+		Password: "pass1",
+	}
+	fmt.Printf(conn.ConnectionURL())
+
 	db, err := sql.Open("mysql", "mysql:mysql@/balancer_db")
 
 	if err != nil {
