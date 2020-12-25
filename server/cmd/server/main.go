@@ -2,56 +2,40 @@ package main
 
 import (
 	"database/sql"
-	"flag"
-	"log"
-	"net/http"
-	"os"
-	"os/signal"
-	_"github.com/go-sql-driver/mysql"
+	"fmt"
 
-	"github.com/inovarka/lab3/server/db"
+	_ "github.com/go-sql-driver/mysql"
 )
 
-var httpPortNumber = flag.Int("p", 8080, "HTTP port number")
-
-func NewDbConnection() (*sql.DB, error) {
-	conn := &db.Connection{
-		DbName:     "lab3_se",
-		User:       "mysql",
-		Password:	"mysql"
-		Host:       "localhost",
-		DisableSSL: true,
-	}
-	return conn.Open()
+type balancer struct {
+	id   int
+	name string
 }
 
 func main() {
-	// Parse command line arguments. Port number may be defined with "-p" flag.
-	flag.Parse()
+	db, err := sql.Open("mysql", "mysql:mysql@/balancer_db")
 
-	// Create the server.
-	if server, err := ComposeApiServer(HttpPortNumber(*httpPortNumber)); err == nil {
-		// Start it.
-		go func() {
-			log.Println("Starting chat server...")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+	rows, err := db.Query("select * from balancer_db.Balancer")
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+	balancers := []balancer{}
 
-			err := server.Start()
-			if err == http.ErrServerClosed {
-				log.Printf("HTTP server stopped")
-			} else {
-				log.Fatalf("Cannot start HTTP server: %s", err)
-			}
-		}()
-
-		// Wait for Ctrl-C signal.
-		sigChannel := make(chan os.Signal, 1)
-		signal.Notify(sigChannel, os.Interrupt)
-		<-sigChannel
-
-		if err := server.Stop(); err != nil && err != http.ErrServerClosed {
-			log.Printf("Error stopping the server: %s", err)
+	for rows.Next() {
+		p := balancer{}
+		err := rows.Scan(&p.id, &p.name)
+		if err != nil {
+			fmt.Println(err)
+			continue
 		}
-	} else {
-		log.Fatalf("Cannot initialize chat server: %s", err)
+		balancers = append(balancers, p)
+	}
+	for _, p := range balancers {
+		fmt.Println(p.id, p.name)
 	}
 }
