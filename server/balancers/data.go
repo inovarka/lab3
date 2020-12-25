@@ -10,6 +10,11 @@ type Balancer struct {
 	TotalMachinesCount int64    `json:"totalMachinesCount"`
 }
 
+type Machine struct {
+	Id                 int64    `json:"id"`
+	IsWorking          bool 	`json:"isWorking"`
+}
+
 type Balancers struct {
 	BalancersArr []*Forum `json:"balancers"`
 }
