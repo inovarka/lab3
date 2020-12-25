@@ -8,10 +8,10 @@ import (
 	"github.com/inovarka/lab3/server/tools"
 )
 
-// HTTPHandlerFunc is Plants HTTP handler.
+// HTTPHandlerFunc is Balancers HTTP handler.
 type HTTPHandlerFunc http.HandlerFunc
 
-// HTTPHandler creates a new instance of plants HTTP handler.
+// HTTPHandler creates a new instance of Balancers HTTP handler.
 func HTTPHandler(store *Store) HTTPHandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 		if r.Method == "GET" {
