@@ -7,16 +7,16 @@ import (
 type Balancer struct {
 	Id                 int64    `json:"id"`
 	UsedMachines       []string `json:"usedMachines"`
-	TotalMachinesCount int64    `json:"totalMachinesCount"`
+	TotalMachinesCount []string `json:"totalMachinesCount"`
 }
 
 type Machine struct {
-	Id                 int64    `json:"id"`
-	IsWorking          bool 	`json:"isWorking"`
+	Id        int64 `json:"id"`
+	IsWorking bool  `json:"isWorking"`
 }
 
 type Balancers struct {
-	BalancersArr []*Forum `json:"balancers"`
+	BalancersArr []*Balancer `json:"forums"`
 }
 
 type Store struct {
@@ -28,7 +28,7 @@ func NewStore(db *sql.DB) *Store {
 }
 
 //ListBalancers returns a list of all balancers
-func (s *Store) ListBalancers() ([]*Balancer, error) {
+func (s *Store) ListBalancers() (*Balancers, error) {
 	rows, err := s.Db.Query("SELECT id FROM Balancer")
 	if err != nil {
 		return nil, err
@@ -47,33 +47,33 @@ func (s *Store) ListBalancers() ([]*Balancer, error) {
 
 	var fullBalancers []*Balancer
 	if res == nil {
-			fullBalancers = make([]*Balancer,0)
+		fullBalancers = make([]*Balancer, 0)
 	} else {
-			for i := 0, i<len(res);i++ {
-				machines,err := s.GetWorkingMachineByID(res[i].Id)
-				if err != nil {
-					return nil, err
-				}
-				machinesCount,err := s.GetMachineCountByID(res[i].Id)
-				if err != nil {
-					return nil, err
-				}
-				fullBalancer := Balancer{
-						Id:	res[i].Id,
-						UsedMachines: machines,
-						TotalMachinesCount: machinesCount}
-				fullBalancers = append(fullBalancers,&fullBalancer)
+		for i := 0; i < len(res); i++ {
+			machines, err := s.GetWorkingMachineByID(res[i].Id)
+			if err != nil {
+				return nil, err
 			}
+			machinesCount, err := s.GetMachineCountByID(res[i].Id)
+			if err != nil {
+				return nil, err
+			}
+			fullBalancer := Balancer{
+				Id:                 res[i].Id,
+				UsedMachines:       machines,
+				TotalMachinesCount: machinesCount}
+			fullBalancers = append(fullBalancers, &fullBalancer)
+		}
 	}
 
-	result := &Balancers{fullBalancers} 
-	return result, nil
+	result := &Balancers{fullBalancers}
+	return result, err
 }
 
-func (s *ForumStore) GetMachineCountByID(id int) ([]string, error) {
+func (s *Store) GetMachineCountByID(id int64) ([]string, error) {
 	rows, err := s.Db.Query(`select count(*) from balancer b 
 	join VirtualMachine vm on vm.BalancerID = b.ID
-	where b.ID = $1`,id)
+	where b.ID = $1`, id)
 
 	if err != nil {
 		return nil, err
@@ -98,10 +98,10 @@ func (s *ForumStore) GetMachineCountByID(id int) ([]string, error) {
 	return res, nil
 }
 
-func (s *ForumStore) GetWorkingMachineByID(id int) ([]string, error) {
+func (s *Store) GetWorkingMachineByID(id int64) ([]string, error) {
 	rows, err := s.Db.Query(`select vm.ID from balancer b 
 	join VirtualMachine vm on vm.BalancerID = b.ID
-	where b.ID = $1 and vm.IsWorking = true`,id)
+	where b.ID = $1 and vm.IsWorking = true`, id)
 
 	if err != nil {
 		return nil, err

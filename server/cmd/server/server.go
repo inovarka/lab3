@@ -14,7 +14,7 @@ type HttpPortNumber int
 type BalancerApiServer struct {
 	Port HttpPortNumber
 
-	BalancersHandler balancers.HttpHandlerFunc
+	BalancersHandler balancers.HTTPHandlerFunc
 
 	server *http.Server
 }
@@ -31,7 +31,7 @@ func (s *BalancerApiServer) Start() error {
 	}
 
 	handler := new(http.ServeMux)
-	handler.HandleFunc("/balancers", s.ChannelsHandler)
+	handler.HandleFunc("/balancers", s.BalancersHandler)
 
 	s.server = &http.Server{
 		Addr:    fmt.Sprintf(":%d", s.Port),

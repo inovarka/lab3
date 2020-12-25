@@ -34,14 +34,14 @@ func handleListBalancers(store *Store, rw http.ResponseWriter) {
 	tools.WriteJsonOk(rw, res)
 }
 
-func handlePlantUpdate(r *http.Request, rw http.ResponseWriter, store *Store) {
+func handleMachineUpdate(r *http.Request, rw http.ResponseWriter, store *Store) {
 	var machine Machine
-	if err := json.NewDecoder(r.Body).Decode(&plant); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&machine); err != nil {
 		log.Printf("Error decoding machine input: %s", err)
 		tools.WriteJsonBadRequest(rw, "bad JSON payload")
 		return
 	}
-	err := store.UpdateMachine(machine.ID, machine.isWorking)
+	err := store.UpdateMachine(machine.Id, machine.IsWorking)
 	if err == nil {
 		tools.WriteJsonOk(rw, &machine)
 	} else {
