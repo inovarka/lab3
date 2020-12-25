@@ -9,6 +9,8 @@ import (
 	"os/signal"
 
 	"github.com/inovarka/lab3/server/db"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 var httpPortNumber = flag.Int("p", 8080, "HTTP port number")
@@ -30,7 +32,7 @@ func main() {
 	if server, err := ComposeApiServer(HttpPortNumber(*httpPortNumber)); err == nil {
 		// Start it.
 		go func() {
-			log.Println("Starting chat server...")
+			log.Println("Starting balancers server...")
 
 			err := server.Start()
 			if err == http.ErrServerClosed {
@@ -49,6 +51,6 @@ func main() {
 			log.Printf("Error stopping the server: %s", err)
 		}
 	} else {
-		log.Fatalf("Cannot initialize chat server: %s", err)
+		log.Fatalf("Cannot initialize balancers server: %s", err)
 	}
 }

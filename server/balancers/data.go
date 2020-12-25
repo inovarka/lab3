@@ -16,7 +16,7 @@ type Machine struct {
 }
 
 type Balancers struct {
-	BalancersArr []*Balancer `json:"forums"`
+	BalancersArr []*Balancer `json:"Balancers"`
 }
 
 type Store struct {
@@ -64,6 +64,7 @@ func (s *Store) ListBalancers() (*Balancers, error) {
 				TotalMachinesCount: machinesCount}
 			fullBalancers = append(fullBalancers, &fullBalancer)
 		}
+
 	}
 
 	result := &Balancers{fullBalancers}
@@ -73,7 +74,7 @@ func (s *Store) ListBalancers() (*Balancers, error) {
 func (s *Store) GetMachineCountByID(id int64) ([]string, error) {
 	rows, err := s.Db.Query(`select count(*) from balancer b 
 	join VirtualMachine vm on vm.BalancerID = b.ID
-	where b.ID = $1`, id)
+	where b.ID = ?`, id)
 
 	if err != nil {
 		return nil, err
@@ -101,7 +102,7 @@ func (s *Store) GetMachineCountByID(id int64) ([]string, error) {
 func (s *Store) GetWorkingMachineByID(id int64) ([]string, error) {
 	rows, err := s.Db.Query(`select vm.ID from balancer b 
 	join VirtualMachine vm on vm.BalancerID = b.ID
-	where b.ID = $1 and vm.IsWorking = true`, id)
+	where b.ID = ? and vm.IsWorking = true`, id)
 
 	if err != nil {
 		return nil, err
